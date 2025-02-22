@@ -5,22 +5,23 @@
 </head>
 <body>
   <h1>Test Accessibility Scan</h1>
-  <input id="urlInput" type="text" placeholder="Enter a website URL">
-  <button onclick="scanSite()">Scan Now</button>
+  <button onclick="scanCurrentPage()">Scan This Page</button>
+  <p id="results">Scan results will appear here.</p>
   <script>
-    function scanSite() {
-      const url = document.getElementById('urlInput').value;
-      window.open(url, '_blank');
-      setTimeout(() => {
-        axe.run(document, { runOnly: ['wcag2a', 'wcag2aa'] }, (err, results) => {
-          if (err) { console.error(err); alert('Error scanning'); }
-          else sendToSheets(url, results.violations);
-        });
-      }, 2000);
+    function scanCurrentPage() {
+      axe.run(document, { runOnly: ['wcag2a', 'wcag2aa'] }, (err, results) => {
+        if (err) {
+          console.error(err);
+          document.getElementById('results').innerText = 'Error scanning page: ' + err.message;
+        } else {
+          const issueCount = results.violations.length;
+          const issues = results.violations.map(v => v.description).join('; ');
+          sendToSheets('https://AccessEasyBot.github.io/accesseasy-test/', issueCount, issues);
+          document.getElementById('results').innerText = `Found ${issueCount} issues: ${issues}`;
+        }
+      });
     }
-    function sendToSheets(url, violations) {
-      const issueCount = violations.length;
-      const issues = violations.map(v => v.description).join('; ');
+    function sendToSheets(url, issueCount, issues) {
       fetch('https://script.google.com/macros/s/AKfycbyeyDwjQzKL_pCPQNf22r0--zXJ5VSmZLbWR4VsDYW9zUFZ2EfRLLj3aFMXE5abwHhM/exec', {
         method: 'POST',
         body: JSON.stringify({ url, issueCount, issues }),
