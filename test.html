@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/axe-core@4.9.0/axe.min.js"></script>
+</head>
+<body>
+  <h1>Test Accessibility Scan</h1>
+  <input id="urlInput" type="text" placeholder="Enter a website URL">
+  <button onclick="scanSite()">Scan Now</button>
+  <script>
+    function scanSite() {
+      const url = document.getElementById('urlInput').value;
+      window.open(url, '_blank');
+      setTimeout(() => {
+        axe.run(document, { runOnly: ['wcag2a', 'wcag2aa'] }, (err, results) => {
+          if (err) { console.error(err); alert('Error scanning'); }
+          else sendToSheets(url, results.violations);
+        });
+      }, 2000);
+    }
+    function sendToSheets(url, violations) {
+      const issueCount = violations.length;
+      const issues = violations.map(v => v.description).join('; ');
+      fetch('https://script.google.com/macros/s/AKfycbw-8LH9SZJG8IAGv3OFp7psKvZ6xKG8aX1YoM8zKIcYKOChx-ybuIhkucUMkYVoIAW6/exec', {
+        method: 'POST',
+        body: JSON.stringify({ url, issueCount, issues }),
+        headers: { 'Content-Type': 'application/json' }
+      }).then(() => alert('Scan sent to Sheets! Check it out.'));
+    }
+  </script>
+</body>
+</html>
