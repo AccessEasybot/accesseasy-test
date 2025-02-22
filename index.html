@@ -21,7 +21,7 @@
     function sendToSheets(url, violations) {
       const issueCount = violations.length;
       const issues = violations.map(v => v.description).join('; ');
-      fetch('https://script.google.com/macros/s/AKfycbzO8hkPbxL-NRI1h9yQYu20fzrra1KyEf9FVk08ebM2wB9230C9KaUpr4afyiqtbo4/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbyeyDwjQzKL_pCPQNf22r0--zXJ5VSmZLbWR4VsDYW9zUFZ2EfRLLj3aFMXE5abwHhM/exec', {
         method: 'POST',
         body: JSON.stringify({ url, issueCount, issues }),
         headers: { 'Content-Type': 'application/json' }
